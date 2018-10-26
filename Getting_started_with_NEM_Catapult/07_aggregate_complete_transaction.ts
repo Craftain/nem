@@ -16,7 +16,9 @@ import {
 const nodeUrl = 'http://localhost:3000';
 const transactionHttp = new TransactionHttp(nodeUrl);
 
+// Todo: Use customers' addresses (separated with comma)
 const customersAddresses: Address[] = [];
+// Todo: Use vendor's private key
 const ticketVendorAccount = Account.createFromPrivateKey('', NetworkType.MIJIN_TEST);
 
 // 02 - Create the transfer transactions to send

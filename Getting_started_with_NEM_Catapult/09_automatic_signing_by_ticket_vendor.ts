@@ -1,6 +1,3 @@
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/map';
 import {
     Account,
     AggregateTransaction,
@@ -17,9 +14,14 @@ import {
     XEM
 } from "nem2-sdk";
 
+import {filter, map, mergeMap} from "rxjs/operators";
+
 // 01 - Set up
-const ticketVendorAccount = Account.createFromPrivateKey('E6640D64B685852EE3C972B9F843F5EC1A74C7387FAC05711CFC3918A5B7C5C2', NetworkType.MIJIN_TEST);
-const exchangePublicAccount = PublicAccount.createFromPublicKey('A335A29A2D14D9C303FF8A3DA2802B0C9633D1DF2CD52A62E30F79DD2A995D64', NetworkType.MIJIN_TEST);
+
+// Todo: Use vendor's public key
+const exchangePublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
+// Todo: Use vendor's private key
+const ticketVendorAccount = Account.createFromPrivateKey('', NetworkType.MIJIN_TEST);
 
 const nodeUrl = 'http://localhost:3000';
 const transactionHttp = new TransactionHttp(nodeUrl);
@@ -27,7 +29,7 @@ const listener = new Listener(nodeUrl);
 
 // 02 - Specify ticket price and mosaic
 const ticketPrice = XEM.createRelative(190);
-// For this video, we'll fetch this using nem2-cli
+// Todo: For this exercise, we'll fetch this using nem2-cli
 const ticketId = new MosaicId([ 3559849083, 313884163 ]); 
 
 const cosignAggregateBondedTransaction = (transaction: AggregateTransaction, account: Account): CosignatureSignedTransaction => {
@@ -96,11 +98,11 @@ listener.open().then(() => {
 
     listener
         .aggregateBondedAdded(ticketVendorAccount.address)
-        .filter((_) => !_.signedByAccount(ticketVendorAccount.publicAccount))
-        .filter((_) => (isAggregateTransactionValid(_.innerTransactions)))
-        // cosign transaction
-        .map(transaction => cosignAggregateBondedTransaction(transaction, ticketVendorAccount))
-        // announce
-        .flatMap(cosignatureSignedTransaction => transactionHttp.announceAggregateBondedCosignature(cosignatureSignedTransaction))
+        .pipe(
+            filter((_) => !_.signedByAccount(ticketVendorAccount.publicAccount)),
+            filter((_) => (isAggregateTransactionValid(_.innerTransactions))),
+            map(transaction => cosignAggregateBondedTransaction(transaction, ticketVendorAccount)),
+            mergeMap(cosignatureSignedTransaction => transactionHttp.announceAggregateBondedCosignature(cosignatureSignedTransaction))
+        )
         .subscribe(announcedTransaction => console.log(announcedTransaction), err => console.error(err));
 });

@@ -1,5 +1,3 @@
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
 import {
     Account,
     AggregateTransaction,
@@ -16,14 +14,17 @@ import {
     UInt64,
     XEM
 } from "nem2-sdk";
+import {filter, mergeMap} from "rxjs/operators";
 
 
 // 01 - Set up
 const nodeUrl = 'http://localhost:3000';
 const transactionHttp = new TransactionHttp(nodeUrl);
 
-const customerPublicAccount = PublicAccount.createFromPublicKey('47E314CCE7D3C38C6AA90F6133A41623EB31A18D9B4F056E95EDC77B02B671BC', NetworkType.MIJIN_TEST);
-const ticketVendorAccount = Account.createFromPrivateKey('E6640D64B685852EE3C972B9F843F5EC1A74C7387FAC05711CFC3918A5B7C5C2', NetworkType.MIJIN_TEST);
+// Todo: Use customer's public key
+const customerPublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
+// Todo: Use vendor's private key
+const ticketVendorAccount = Account.createFromPrivateKey('', NetworkType.MIJIN_TEST);
 
 // 02 - Define the transactions
 const customerToTicketVendorTx = TransferTransaction.create(
@@ -63,8 +64,6 @@ const lockFundsTransaction = LockFundsTransaction.create(
 
 const lockFundsTransactionSigned = ticketVendorAccount.sign(lockFundsTransaction);
 
-
-
 const listener = new Listener(nodeUrl);
 
 listener.open().then(() => {
@@ -75,9 +74,11 @@ listener.open().then(() => {
     // 07 - Once confirmed, announce the aggregate bonded transaction with the vendor account.
     listener
         .confirmed(ticketVendorAccount.address)
-        .filter((transaction) => transaction.transactionInfo !== undefined
-            && transaction.transactionInfo.hash === lockFundsTransactionSigned.hash)
-        .flatMap(ignored => transactionHttp.announceAggregateBonded(signedTransaction))
+        .pipe(
+            filter((transaction) => transaction.transactionInfo !== undefined
+                && transaction.transactionInfo.hash === lockFundsTransactionSigned.hash),
+            mergeMap(ignored => transactionHttp.announceAggregateBonded(signedTransaction))
+        )
         .subscribe(announcedAggregateBonded =>
             console.log(announcedAggregateBonded), err => console.error(err));
 });
