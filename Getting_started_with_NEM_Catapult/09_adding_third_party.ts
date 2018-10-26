@@ -1,5 +1,3 @@
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
 import {
     Account,
     AggregateTransaction,
@@ -17,13 +15,18 @@ import {
     XEM
 } from "nem2-sdk";
 
+import {filter, mergeMap} from "rxjs/operators";
+
 // 01 - Set up
 const nodeUrl = 'http://localhost:3000';
 const transactionHttp = new TransactionHttp(nodeUrl);
 
-const customerPublicAccount = PublicAccount.createFromPublicKey('47E314CCE7D3C38C6AA90F6133A41623EB31A18D9B4F056E95EDC77B02B671BC', NetworkType.MIJIN_TEST);
-const ticketVendorPublicAccount = PublicAccount.createFromPublicKey('D30EA2EFCCA24354E57778AD34B308529A07BB38117AA3317117305D11DDC724', NetworkType.MIJIN_TEST);
-const exchangeAccount = Account.createFromPrivateKey('E366D17DD05A535F43ADBDE4CA47952FD0FD6D337B3F612CF64E8CB0182F4F5D', NetworkType.MIJIN_TEST);
+// Todo: Use customer's public key
+const customerPublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
+// Todo: Use ticket vendor's public key
+const ticketVendorPublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
+// Todo: Use exchange's private key
+const exchangeAccount = Account.createFromPrivateKey('', NetworkType.MIJIN_TEST);
 
 const ticketPrice = 190;
 
@@ -97,9 +100,11 @@ listener.open().then(() => {
 
     listener
         .confirmed(exchangeAccount.address)
-        .filter((transaction) => transaction.transactionInfo !== undefined
-            && transaction.transactionInfo.hash === lockFundsTransactionSigned.hash)
-        .flatMap(ignored => transactionHttp.announceAggregateBonded(signedTransaction))
+        .pipe(
+            filter((transaction) => transaction.transactionInfo !== undefined
+            && transaction.transactionInfo.hash === lockFundsTransactionSigned.hash),
+            mergeMap(ignored => transactionHttp.announceAggregateBonded(signedTransaction))
+        )
         .subscribe(announcedAggregateBonded =>
             console.log(announcedAggregateBonded), err => console.error(err));
 });

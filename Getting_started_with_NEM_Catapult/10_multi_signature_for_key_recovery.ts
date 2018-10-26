@@ -13,9 +13,13 @@ import {
 const nodeUrl = 'http://localhost:3000';
 const transactionHttp = new TransactionHttp(nodeUrl);
 
+// Todo: Use customer's private key
 const customerAccount = Account.createFromPrivateKey('', NetworkType.MIJIN_TEST);
+// Todo: Use phone's public key
 const phonePublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
+// Todo: Use backup's public key
 const backupPublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
+// Todo: Use computer's public key
 const computerPublicAccount = PublicAccount.createFromPublicKey('', NetworkType.MIJIN_TEST);
 
 // 02 - Define Modify Multisig Account Transaction

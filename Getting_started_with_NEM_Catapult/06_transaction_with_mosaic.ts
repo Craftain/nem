@@ -16,8 +16,10 @@ import {
 const nodeUrl ='http://localhost:3000';
 const transactionHttp = new TransactionHttp(nodeUrl);
 
-const customerAddress = Address.createFromRawAddress('SCHG66EPRRTL7ESOLVTPIUBDJY7OSH4STE2JJ4PE');
-const ticketVendorAccount = Account.createFromPrivateKey('542174EB4083109AF5C77008AE591CD01E756CEE9C24FAD78F07865E82AE656A', NetworkType.MIJIN_TEST);
+// Todo: Use customer's address
+const customerAddress = Address.createFromRawAddress('');
+// Todo: Use vendor's private key
+const ticketVendorAccount = Account.createFromPrivateKey('', NetworkType.MIJIN_TEST);
 
 // 02 - Create the transfer transaction
 const transferTransaction = TransferTransaction.create(

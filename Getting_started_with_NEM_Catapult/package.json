@@ -1,0 +1,15 @@
+{
+  "name": "getting_started_with_nem_catapult",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nem Foundation",
+  "dependencies": {
+    "js-sha3": "^0.8.0",
+    "nem2-sdk": "^0.10.1",
+    "rxjs": "^6.3.3"
+  }
+}
